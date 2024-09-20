@@ -31,6 +31,19 @@ PATH = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
 DATA_BASE = os.path.join(PATH, "data")
 
+# 允许的国家列表
+ALLOWED_COUNTRIES = [
+    '日本', 'Japan', 'JP',
+    '韩国', 'Korea', 'KR',
+    '台湾', 'Taiwan', 'TW',
+    '新加坡', 'Singapore', 'SG',
+    '香港', 'Hong Kong', 'HK',
+    '美国', 'United States', 'USA', 'US'
+]
+
+def is_allowed_country(proxy_name):
+    return any(country.lower() in proxy_name.lower() for country in ALLOWED_COUNTRIES)
+
 
 def assign(
     bin_name: str,
@@ -205,7 +218,7 @@ def aggregate(args: argparse.Namespace) -> None:
 
         return utils.trim(words[0]), utils.trim(words[1])
 
-    clash_bin, subconverter_bin = executable.which_bin()
+clash_bin, subconverter_bin = executable.which_bin()
     display = not args.invisible
 
     subscribes_file = "subscribes.txt"
@@ -244,6 +257,10 @@ def aggregate(args: argparse.Namespace) -> None:
     results = utils.multi_thread_run(func=workflow.executewrapper, tasks=tasks, num_threads=args.num)
     proxies = list(itertools.chain.from_iterable([x[1] for x in results if x]))
 
+    # 过滤允许的国家节点
+    proxies = [proxy for proxy in proxies if is_allowed_country(proxy.get('name', ''))]
+
+   
     if len(proxies) == 0:
         logger.error("exit because cannot fetch any proxy node")
         sys.exit(0)
