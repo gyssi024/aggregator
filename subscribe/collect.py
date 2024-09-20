@@ -218,12 +218,13 @@ def aggregate(args: argparse.Namespace) -> None:
 
         return utils.trim(words[0]), utils.trim(words[1])
 
-clash_bin, subconverter_bin = executable.which_bin()
+    clash_bin, subconverter_bin = executable.which_bin()
     display = not args.invisible
 
     subscribes_file = "subscribes.txt"
     access_token = utils.trim(args.key)
     username, gist_id = parse_gist_link(args.gist)
+
 
     tasks = assign(
         bin_name=subconverter_bin,
